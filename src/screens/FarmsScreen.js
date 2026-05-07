@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://172.20.80.1:8000/api'; // CHANGE TO YOUR IP
+const API_URL = 'http://192.168.100.212:8000/api'; // CHANGE TO YOUR IP
 
 export default function FarmsScreen() {
   const [farms, setFarms] = useState([]);
