@@ -1,9 +1,9 @@
+// services/api.js
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // CHANGE THIS TO YOUR COMPUTER'S IP ADDRESS
-// Run 'ipconfig' in CMD to find your IP
-const IP_ADDRESS = '192.168.100.212'; // CHANGE THIS!
+const IP_ADDRESS = '192.168.100.212'; // Make sure this is correct!
 const API_BASE_URL = `http://${IP_ADDRESS}:8000/api`;
 
 const api = axios.create({
@@ -51,30 +51,31 @@ api.interceptors.response.use(
   }
 );
 
-export const API_URL = API_BASE_URL;
+// Auth APIs - MAKE SURE THESE ARE EXPORTED
+export const register = (userData) => {
+  console.log('Making API call to:', `${API_BASE_URL}/auth/register/`);
+  console.log('With data:', userData);
+  return api.post('/auth/register/', userData);
+};
 
-// Auth APIs
-export const register = (userData) => api.post('/auth/register/', userData);
 export const login = (credentials) => api.post('/auth/login/', credentials);
 export const getProfile = () => api.get('/users/me/');
 
-// Farm APIs
+// Email Verification APIs
+export const verifyEmail = (token) => api.post('/auth/verify-email/', { token });
+export const resendVerificationEmail = (email) => api.post('/auth/resend-verification/', { email });
+
+// Other APIs
 export const getFarms = () => api.get('/farms/');
 export const getFarm = (id) => api.get(`/farms/${id}/`);
 export const createFarm = (data) => api.post('/farms/', data);
 export const updateFarm = (id, data) => api.put(`/farms/${id}/`, data);
 export const deleteFarm = (id) => api.delete(`/farms/${id}/`);
-
-// Scan APIs
 export const getScans = (params) => api.get('/scans/', { params });
 export const createScan = (data) => api.post('/scans/', data);
-
-// Alert APIs
 export const getAlerts = () => api.get('/alerts/');
-export const updateAlertStatus = (id, status) => 
-  api.patch(`/alerts/${id}/update_status/`, { status });
-
-// Dashboard API
+export const updateAlertStatus = (id, status) => api.patch(`/alerts/${id}/update_status/`, { status });
 export const getDashboardStats = () => api.get('/dashboard/stats/');
 
+export const API_URL = API_BASE_URL;
 export default api;

@@ -1,3 +1,4 @@
+// screens/LoginScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -30,13 +31,38 @@ export default function LoginScreen({ navigation }) {
       const response = await login({ username, password });
       const { access, refresh } = response.data;
       
+      // Check if user is verified
+      // Assuming your backend returns is_verified in the response
+      if (response.data.user && !response.data.user.is_verified) {
+        Alert.alert(
+          'Email Not Verified',
+          'Please verify your email address before logging in. Check your inbox for the verification code.',
+          [
+            { text: 'OK', onPress: () => navigation.navigate('Register') },
+            {
+              text: 'Resend Code',
+              onPress: () => navigation.navigate('EmailVerification', {
+                email: response.data.user.email || username,
+                username: username,
+                password: password,
+              })
+            }
+          ]
+        );
+        setLoading(false);
+        return;
+      }
+      
       await AsyncStorage.setItem('access_token', access);
       await AsyncStorage.setItem('refresh_token', refresh);
       await AsyncStorage.setItem('username', username);
       
       navigation.replace('Main');
     } catch (error) {
-      Alert.alert('Login Failed', error.response?.data?.detail || 'Invalid credentials');
+      const errorMsg = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid credentials or email not verified';
+      Alert.alert('Login Failed', errorMsg);
     } finally {
       setLoading(false);
     }
